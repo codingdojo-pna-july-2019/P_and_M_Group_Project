@@ -1,0 +1,11 @@
+
+span{
+  font-weight:bold;
+}
+form{
+  display:inline-block;
+  height:40px;
+}
+form select{
+  width:50px;
+}

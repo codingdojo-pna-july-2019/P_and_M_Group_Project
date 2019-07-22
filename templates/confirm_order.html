@@ -1,0 +1,195 @@
+<!doctype html>
+<html class="no-js" lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <title>Yoga Store | Welcome</title>
+    <link rel="stylesheet" href="{{url_for('static',filename='css/confirm_order.css')}}">
+    <link rel="stylesheet" href="https://dhbhdrzi4tiry.cloudfront.net/cdn/sites/foundation.min.css">
+   
+  </head>
+  <body>
+    
+    <!-- Start Top Bar -->
+    <div class="top-bar">
+      <div class="top-bar-left">
+        <ul class="menu">
+          <li class="menu-text">Yoga Store</li>
+          <li><a href="#yoga-products">Products</a></li>
+          <li><a href="#yoga-services">Services</a></li>
+        </ul>
+      </div>
+      <div class="top-bar-right">
+        <ul class="menu">
+          {% if 'id' in session %}
+          <li>Welcome, {{session.first_name}}</li>
+          <li><a href="/my_account">My Account</a></li>
+          <li><a href="/logout">Logout</a></li>
+          {% else %}
+          <li><a href="/login">Login|Register</a></li>
+          {% endif %}
+          <li><a href="/cart">Cart</a></li>
+        </ul>
+      </div>
+    </div>
+    <!-- End Top Bar -->
+    <div class="callout large primary">
+      <div class="text-center">
+        <h1>Confirm Order</h1>
+      </div>
+    </div>
+    
+    <div class="row column text-center">
+      <h3><span>Order Total: </span> $400</h3>
+      <hr>
+    </div>
+
+    <div id="messages">
+      <p class='fn hidden'>Please enter a first name.</p>
+      <p class='ln hidden'>Please enter a last name.</p>
+      <p class='email hidden'>Please enter a valid email address.</p>
+      <p class='password hidden'>Password must have at least 8 characters, one uppercase, one lowercase, and one number.</p>
+      <p class='cpassword hidden'>Passwords don't match.</p>
+      <div class='flash-messages'>
+        {% with messages = get_flashed_messages() %}
+        <!-- declare a variable called messages -->
+        {% if messages %}
+        <!-- check if there are any messages -->
+        {% for message in messages %}
+        <!-- loop through the messages -->
+        <p>{{message}}</p>
+        <!-- display each message in a paragraph tag -->
+        {% endfor %} {% endif %} {% endwith %}
+      </div>
+    </div><!--messages-->
+
+    <div class="row column large-up-2">
+      <div class="column">
+        <form action="/add_shipping" method="POST" id='shipping-form'>
+          <h1>Shipping Information</h1>
+          <p>
+            <label for="fn">First Name</label>
+            <input type="text" name="first_name" id="fn" class="form-control">
+          </p>
+          <p>
+            <label for="ln">Last Name</label>
+            <input type="text" name="last_name" id="ln" class="form-control">
+          </p>
+          <p>
+            <label for="street">Street Address</label>
+            <input type="text" name="street" id="street" class="form-control">
+          </p>
+          <p>
+            <label for="city">City</label>
+            <input type="text" name="city" id="city" class="form-control">
+          </p>
+          <p>
+            <label for="states">State</label>
+            <input type="text" name="state" id="state" class="form-control">
+          </p>
+          <p>
+            <label for="zip_code">Zip Code</label>
+            <input type="text" name="zip_code" id="zip_code" class="form-control">
+          </p>
+          <p>
+            <input type="submit" value="Proceed to Checkout with PayPal" id="btnSubmit">
+          </p>
+        </form>
+      </div>
+      <div class="column">
+        <h1>Cart</h1>
+        <hr>
+        <div class="row small-up-2 ordered-item">
+          <div class="column">
+            <h6><span>Name:</span><a href="/view_item/item.id">item.name</a></h6>
+            <h6><span>Description:</span> item.description</h6>
+            <h6><span>Quantity:</span> item.quantity</h6>
+            <h6><span>Unit Cost:</span> item.unit_cost</h6>
+            <h6><span>Total Cost:</span> item.unit_cost * item.quantity</h6>
+          </div>
+          <div class="column">
+              <img class="thumbnail" src="https://placehold.it/200x100">
+          </div>
+        </div>
+        <hr>
+          
+        <div class="row small-up-2 ordered-item">
+          <div class="column">
+            <h6><span>Name:</span><a href="/view_item/item.id">item.name</a></h6>
+            <h6><span>Description:</span> item.description</h6>
+            <h6><span>Quantity:</span> item.quantity</h6>
+            <h6><span>Unit Cost:</span> item.unit_cost</h6>
+            <h6><span>Total Cost:</span> item.unit_cost * item.quantity</h6>
+          </div>
+          <div class="column">
+              <img class="thumbnail" src="https://placehold.it/200x100">
+          </div>
+        </div>
+        <hr>
+          
+        {% for item in items %}
+        <div class="row small-up-2 ordered-item">
+          <div class="column">
+            <h6><span>Name:</span><a href="/view_item/item.id">item.name</a></h6>
+            <h6><span>Description:</span> item.description</h6>
+            <h6><span>Quantity:</span> item.quantity</h6>
+            <h6><span>Unit Cost:</span> item.unit_cost</h6>
+            <h6><span>Total Cost:</span> item.unit_cost * item.quantity</h6>
+          </div>
+          <div class="column">
+            <img class="thumbnail" src="https://placehold.it/200x100">
+          </div>
+        </div>
+        <hr>
+        {% endfor %}
+      </div>
+    </div>
+
+    <div class="callout large secondary">
+      <div class="row">
+        <div class="large-4 columns">
+          <h5>Vivamus Hendrerit Arcu Sed Erat Molestie</h5>
+          <p>Curabitur vulputate, ligula lacinia scelerisque tempor, lacus lacus ornare ante, ac egestas est urna sit amet arcu. Class aptent taciti sociosqu ad litora torquent per conubia nostra, per inceptos himenaeos. Sed molestie augue sit.</p>
+        </div>
+        <div class="large-3 large-offset-2 columns">
+          <ul class="menu vertical">
+            <li><a href="#yoga-products">Products</a></li>
+            <li><a href="#yoga-services">Services</a></li>
+            <li><a href="#">My Account</a></li>
+            <li><a href="#">Login|Register</a></li>
+          </ul>
+        </div>
+        <div class="large-3 columns">
+          <ul class="menu vertical">
+            <li><a href="#">Shopping Cart</a></li>
+            <li><a href="#">Contact Us</a></li>
+            <!--<li><a href="#">Three</a></li>
+            <li><a href="#">Four</a></li>-->
+          </ul>
+        </div>
+      </div>
+    </div>
+
+    <script src="https://code.jquery.com/jquery-2.1.4.min.js"></script>
+    <script src="https://dhbhdrzi4tiry.cloudfront.net/cdn/sites/foundation.js"></script>
+    <script>
+      $(document).foundation();
+    </script>
+    <script
+    src="https://www.paypal.com/sdk/js?client-id=AdQRFW9SyfvciiVeF5oeOWosrOuz1qAdMi0Lguu9rT8MxDya68zQZiQGljosQkIXT9e197qV120VSjre">
+    </script>
+    <script>
+        paypal.Buttons({
+          createOrder: function(data, actions) {
+            // Set up the transaction
+            return actions.order.create({
+              purchase_units: [{
+                amount: {value: '0.01'}
+              }]
+            });
+          }
+        }).render('#paypal-button-container');
+      </script>
+  </body>
+</html>
