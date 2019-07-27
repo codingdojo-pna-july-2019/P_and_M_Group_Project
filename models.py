@@ -1,59 +1,62 @@
 from sqlalchemy.sql import func
+from sqlalchemy import Table, Column, Integer, String, ForeignKey, DateTime
+from sqlalchemy.orm import relationship
+from sqlalchemy.ext.declarative import declarative_base
 from config import db
 
+Base = declarative_base()
 #users - id, fn, ln, email, pw, created_at, updated_at
 #orders - id, cost, user_id, created_at,updated_at 
 #products - id, name, description, unit cost, quantity_available, created_at, updated_at
 #orders_products - id, order_id, product_id
 
-association_table = Table('association', Base.metadata,
+association_table = Table('order_products', Base.metadata,
     Column('order_id', Integer, ForeignKey('orders.id')),
     Column('product_id', Integer, ForeignKey('products.id'))
 )
 
-class Users(db.Model):
+class User(db.Model):
   __tablename__ = "users"
-  id = db.Column(db.Integer, primary_key=True)
-  f_name = db.Column(db.String(45))
-  l_name = db.Column(db.String(45))
-  email = db.Column(db.String(45))
-  pw = db.Column(db.String(45))
-  created_at = db.Column(db.DateTime, server_default=func.now())
-  updated_at = db.Column(db.DateTime, server_default=func.now(), onupdate=func.now())
+  id = Column(Integer, primary_key=True)
+  f_name = Column(String(45))
+  l_name = Column(String(45))
+  email = Column(String(45))
+  pw = Column(String(45))
+  orders = relationship("Order")
+  created_at = Column(DateTime, server_default=func.now())
+  updated_at = Column(DateTime, server_default=func.now(), onupdate=func.now())
 
-class Orders(db.Model):
+class Order(db.Model):
   __tablename__ = "orders"
   products_ordered = relationship (
    "Products",
-   secondary=Orders_Products,
+   secondary=association_table,
    back_populates="orders")
-  
-  id = db.Column(db.Integer, primary_key=True)
-  cost = db.Column(db.Integer)
-  paypal_orders_id = db.Column(db.Integer)
-  user_id =  db.Column(db.Integer, db.ForeignKey('users.id'), nullable = False)
-  created_at = db.Column(db.DateTime, server_default=func.now())
-  updated_at = db.Column(db.DateTime, server_default=func.now(), onupdate=func.now())
+  id = Column(Integer, primary_key=True)
+  cost = Column(Integer)
+  paypal_orders_id = Column(db.Integer)
+  user_id =  Column(Integer, ForeignKey('users.id'))
+  created_at = Column(DateTime, server_default=func.now())
+  updated_at = Column(DateTime, server_default=func.now(), onupdate=func.now())
  
-class Products(db.Model):
+class Product(db.Model):
   __tablename__ = "products"
   orders_containing_product = relationship (
    "Orders",
-   secondary=Orders_Products,
+   secondary=association_table,
    back_populates="products")
-  
-  id = db.Column(db.Integer, primary_key=True)
-  name = db.Column(db.String(45))
-  desc = db.Column(db.String(45))
-  unit_cost = db.Column(db.Integer)
-  created_at = db.Column(db.DateTime, server_default=func.now())
-  updated_at = db.Column(db.DateTime, server_default=func.now(), onupdate=func.now())
+  id = Column(Integer, primary_key=True)
+  name = Column(String(45))
+  descr = Column(String(45))
+  unit_cost = Column(Integer)
+  created_at = Column(DateTime, server_default=func.now())
+  updated_at = Column(DateTime, server_default=func.now(), onupdate=func.now())
 
-class Orders_Products(db.Model):
-  __tablename__ = "order_products"
-  id = db.Column(db.Integer, primary_key=True)
-  created_at = db.Column(db.DateTime, server_default=func.now())
-  updated_at = db.Column(db.DateTime, server_default=func.now(), onupdate=func.now())
+# class Orders_Products(db.Model):
+#   __tablename__ = "order_products"
+#   id = db.Column(db.Integer, primary_key=True)
+#   created_at = db.Column(db.DateTime, server_default=func.now())
+#   updated_at = db.Column(db.DateTime, server_default=func.now(), onupdate=func.now())
 
 
 # class Dojos(db.Model):
