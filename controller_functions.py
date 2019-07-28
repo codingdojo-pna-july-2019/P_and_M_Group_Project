@@ -1,10 +1,15 @@
 from flask import render_template, redirect, request	# we now need fewer imports because we're not doing everything in this file!
 # if we need to work with the database, we'll need those imports:    
 from config import db
-from models import User, Order, Product, association_table
+from models import User, Order, Product, orders_products_table
 
 def landing():
-  return render_template('landing.html')
+  #select all the products and display them on the page
+  #select all the services and display them on the page
+  list_of_all_products = Product.query.all()
+  for product in list_of_all_products:
+    print(product.img_file)
+  return render_template('landing.html',all_products = list_of_all_products)
 
 def login():
   return render_template('registration.html')
@@ -23,6 +28,9 @@ def confirm_order():
 
 def place_order():
   return render_template('place_order.html')
+
+def add_to_cart(id):
+  return redirect('/')
 
 
 # def add_dojo():
