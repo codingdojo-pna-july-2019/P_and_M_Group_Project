@@ -5,3 +5,12 @@
   display:inline-block;
   width:200px;
 }
+.product-column{
+  height:500px;
+}
+.product-column img{
+  width:100%;
+}
+.product-column img:hover{
+  border:2px solid rgb(0, 76, 255);
+}

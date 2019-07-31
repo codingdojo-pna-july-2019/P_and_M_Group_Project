@@ -1,14 +1,13 @@
-from flask import render_template, redirect, request	# we now need fewer imports because we're not doing everything in this file!
+from flask import render_template, redirect, request, session	# we now need fewer imports because we're not doing everything in this file!
 # if we need to work with the database, we'll need those imports:    
 from config import db
 from models import User, Order, Product, orders_products_table
+import json
 
 def landing():
   #select all the products and display them on the page
   #select all the services and display them on the page
   list_of_all_products = Product.query.all()
-  for product in list_of_all_products:
-    print(product.img_file)
   return render_template('landing.html',all_products = list_of_all_products)
 
 def login():
@@ -30,7 +29,22 @@ def place_order():
   return render_template('place_order.html')
 
 def add_to_cart(id):
+  if not 'cart' in session:
+    session['cart'] = list()
+  
+  print(session['cart'])
+  list_of_products = session['cart']
+  
+  instance_of_product = Product.query.get(id)
+  product = {
+    'name':instance_of_product.name,
+    'cost':instance_of_product.unit_cost
+  }
+  list_of_products.append(product)
+  session['cart'] = list_of_products
+  print(session['cart'])
   return redirect('/')
+  #return json.dumps({'status':'OK','cart':session['cart']})
 
 
 # def add_dojo():
