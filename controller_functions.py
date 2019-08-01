@@ -87,6 +87,24 @@ def update_cart():
   
   session['cart'] = list_of_cart_items
   return redirect('/')
+
+def update_cart_checkout():
+  #do the same thing as update_cart() but redirect to the place order page
+  print(request.form)
+  print(session['cart'])
+  list_of_cart_items = session['cart']
+  for form_item in request.form:
+    for cart_item in list_of_cart_items:
+      if cart_item['id'] == form_item:
+        cart_item['quantity'] = int(request.form[form_item])
+        if cart_item['quantity'] == 0:
+          list_of_cart_items.remove(cart_item)
+  
+  session['cart'] = list_of_cart_items
+  return redirect('/place_order')
+
+def place_order():
+  return render_template('/confirm_order.html')
 # def add_dojo():
 #   #print(request.form)
 #   instance_of_dojo = Dojos(

@@ -29,7 +29,7 @@
           {% else %}
           <li><a href="/login">Login|Register</a></li>
           {% endif %}
-          <li><a href="/cart">Cart</a></li>
+          <li><a href="/view_cart">Cart</a></li>
         </ul>
       </div>
     </div>
@@ -101,50 +101,24 @@
         <h1>Cart</h1>
         <hr>
         <div class="row small-up-2 ordered-item">
+          {% for item in session.cart %}
           <div class="column">
-            <h6><span>Name:</span><a href="/view_item/item.id">item.name</a></h6>
-            <h6><span>Description:</span> item.description</h6>
-            <h6><span>Quantity:</span> item.quantity</h6>
-            <h6><span>Unit Cost:</span> item.unit_cost</h6>
-            <h6><span>Total Cost:</span> item.unit_cost * item.quantity</h6>
+            <h6><span>Name:</span><a href="/view_item/item.id">{{item.name}}</a></h6>
+            <h6><span>Description:</span> {{item.description}}</h6>
+            <h6><span>Quantity:</span> {{item.quantity}}</h6>
+            <h6><span>Unit Cost:</span> {{item.unit_cost}}</h6>
+            <h6><span>Total Cost:</span>{{ item.unit_cost * item.quantity}}</h6>
           </div>
           <div class="column">
               <img class="thumbnail" src="https://placehold.it/200x100">
           </div>
+          <hr>
+          {% endfor %}
         </div>
-        <hr>
-          
-        <div class="row small-up-2 ordered-item">
-          <div class="column">
-            <h6><span>Name:</span><a href="/view_item/item.id">item.name</a></h6>
-            <h6><span>Description:</span> item.description</h6>
-            <h6><span>Quantity:</span> item.quantity</h6>
-            <h6><span>Unit Cost:</span> item.unit_cost</h6>
-            <h6><span>Total Cost:</span> item.unit_cost * item.quantity</h6>
-          </div>
-          <div class="column">
-              <img class="thumbnail" src="https://placehold.it/200x100">
-          </div>
-        </div>
-        <hr>
-          
-        {% for item in items %}
-        <div class="row small-up-2 ordered-item">
-          <div class="column">
-            <h6><span>Name:</span><a href="/view_item/item.id">item.name</a></h6>
-            <h6><span>Description:</span> item.description</h6>
-            <h6><span>Quantity:</span> item.quantity</h6>
-            <h6><span>Unit Cost:</span> item.unit_cost</h6>
-            <h6><span>Total Cost:</span> item.unit_cost * item.quantity</h6>
-          </div>
-          <div class="column">
-            <img class="thumbnail" src="https://placehold.it/200x100">
-          </div>
-        </div>
-        <hr>
-        {% endfor %}
       </div>
     </div>
+      
+    <hr>
 
     <div class="callout large secondary">
       <div class="row">

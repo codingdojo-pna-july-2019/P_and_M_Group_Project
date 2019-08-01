@@ -51,30 +51,29 @@
     <h2>Items</h2>
   </div>
   <hr>
-  {% for item in session.cart %}
-  <div class="row small-up-2 ordered-item">
-    <div class="column">
-      <h6><span>Name:</span><a href="/view_item/item.id">{{item.name}}</a></h6>
-      <h6><span>Description:</span>{{item.description}}</h6>
 
-      <form action="/update_cart" method="POST">
-        <p>Quantity:<input type="number" name="{{item.id}}" id="{{item.id}}" class="cart-item form-control" value="{{item.quantity}}" min="0"></p>
-        <input type="submit" value="Update Cart" class="btn update">
-      </form>
-      
-      <h6><span>Unit Cost:</span> ${{item.unit_cost}}</h6>
-      <h6><span>Total Cost:</span> ${{item.unit_cost * item.quantity}}</h6>
+  <div class="row small-up-2 ordered-item">
+    <form  action="/update_cart_checkout" method="POST">
+      {% for item in session.cart %}
+      <div class="column">
+        <h6><span>Name:</span><a href="/view_item/item.id">{{item.name}}</a></h6>
+        <h6><span>Description:</span>{{item.description}}</h6>      
+        <p>Quantity:<input type="number" name="{{item.id}}" id="{{item.id}}" class="cart-item form-control" value="{{item.quantity}}" min="0"></p>    
+        <h6><span>Unit Cost:</span> ${{item.unit_cost}}</h6>
+        <h6><span>Total Cost:</span> ${{item.unit_cost * item.quantity}}</h6>
     </div>
     <div class="column">
         <img class="thumbnail" src="https://placehold.it/200x100">
     </div>
+    <hr>
+    {% endfor %}
+    <div class="row column text-center">
+      <h3><span>Order Total: </span> ${{session.cart_total}}</h3>
+    </div>
+    <input type="submit" value="Proceed to Checkout" class="btn update">
+  </form>
   </div>
-  <hr>
-  {% endfor %}
 
-  <div class="row column text-center">
-    <h3><span>Order Total: </span> ${{session.cart_total}}</h3>
-  </div>
   <hr>
 
   <div class="row column text-center">
