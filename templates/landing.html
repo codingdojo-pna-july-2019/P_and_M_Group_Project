@@ -14,12 +14,13 @@
     
 
     <!-- Start Top Bar -->
+    <div class="top-bar-wrapper">
     <div class="top-bar">
       <div class="top-bar-left">
         <ul class="menu">
           <li class="menu-text">Yoga Store</li>
           <li><a href="#yoga-products">Products</a></li>
-          <li><a href="#yoga-services">Services</a></li>
+          <!--<li><a href="#yoga-services">Services</a></li>-->
         </ul>
       </div>
       <div class="top-bar-right">
@@ -30,10 +31,12 @@
           <li><a href="/logout">Logout</a></li>
           {% else %}
           <li><a href="/login">Login|Register</a></li>
+          <li><a href="/clear_session">Clear Session</a></li>
           {% endif %}
-          <li><a href="/cart">Cart</a></li>
+          <li><button type="button" class="open-button" onclick="openCart()">View Cart</button></li>
         </ul>
       </div>
+    </div>
     </div>
     <!-- End Top Bar -->
     <div class="callout large primary">
@@ -72,7 +75,7 @@
       <hr>
     </div>
 
-    <div class="row small-up-2 large-up-4">
+    <div class="row small-up-2 large-up-4" id="yoga-products">
       {% for product in all_products %}
       <div class="column product-column">
         <img class="thumnail" src="{{url_for('static',filename='img/'+product.img_file)}}">
@@ -93,13 +96,36 @@
       </div>
     </div>
 
+    <div id="my-cart" class="popup">
+      <div id="cart-container">
+        {% if session.cart|length > 0 %}
+        <form action="/update_cart" method="POST">
+          {% for item in session.cart %}
+          <p>
+            <h6>{{item.name}} </h6> <h6>${{item.quantity * item.unit_cost}}</h6>
+            <label for="{{item.id}}">Quantity</label>
+            <input type="number" name="{{item.id}}" id="{{item.id}}" class="cart-item form-control" value="{{item.quantity}}" min="0">
+          </p>        
+          <hr>
+          {% endfor %}
+          <input type="submit" value="Update Cart" class="btn update">
+          <button type="button" class="btn checkout" href="/checkout">Checkout</button>
+        </form>
+        {% else %}
+          <p>No items in cart!</p>
+        {% endif %}
+        <button type="button" class="btn cancel" onclick="closeCart()">Close</button>    
+      </div>
+    </div>
+<!--
     <hr>
 
     <div class="row column text-center" id="yoga-services">
       <h2>Services</h2>
       <hr>
     </div>
-
+  -->
+  <!--
     <div class="row small-up-2 large-up-4">
       <div class="column">
         <img class="thumbnail" src="https://placehold.it/300x400">
@@ -125,22 +151,10 @@
         <p>$400</p>
         <a href="#" class="button small expanded hollow">Add to Cart</a>
       </div>
-      <!-- <div class="column">
-        <img class="thumbnail" src="https://placehold.it/300x400">
-        <h5>Nulla At Nulla Justo, Eget</h5>
-        <p>$400</p>
-        <a href="#" class="button small expanded hollow">Add to Cart</a>
-      </div>
-      <div class="column">
-        <img class="thumbnail" src="https://placehold.it/300x400">
-        <h5>Nulla At Nulla Justo, Eget</h5>
-        <p>$400</p>
-        <a href="#" class="button small expanded hollow">Add to Cart</a>
-      </div> -->
-    </div>
-
+    </div>-->
+<!--
     <hr>
-    <!-- <div class="row">
+    <div class="row">
       <div class="medium-4 columns">
         <h4>Top Products</h4>
         <div class="media-object">
@@ -279,5 +293,13 @@
         }).render('#paypal-button-container');
       </script>
       <!--<script src="{{url_for('static',filename='js/landing.js')}}"></script>-->
+      <script>
+      function openCart(){
+        document.getElementById("my-cart").style.display = "block";
+      }
+      function closeCart(){
+        document.getElementById("my-cart").style.display = "none";
+      }
+      </script>
   </body>
 </html>

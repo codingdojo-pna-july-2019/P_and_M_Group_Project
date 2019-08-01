@@ -10,6 +10,10 @@ def landing():
   list_of_all_products = Product.query.all()
   return render_template('landing.html',all_products = list_of_all_products)
 
+def clear_session():
+  session.clear()
+  return redirect('/')
+
 def login():
   return render_template('registration.html')
 
@@ -37,16 +41,46 @@ def add_to_cart(id):
   
   instance_of_product = Product.query.get(id)
   product = {
+    'id':id,
     'name':instance_of_product.name,
-    'cost':instance_of_product.unit_cost
+    'unit_cost':instance_of_product.unit_cost,
+    'quantity':1 #default quantity set to 1. 
   }
-  list_of_products.append(product)
+  #add products to the session
+  if len(list_of_products) == 0:
+    list_of_products.append(product)
+  else:
+    counter = 0
+    for product_dict in list_of_products:
+      #check if the product is already in the list_of_products.
+      #if so, just increment the quantity
+      #if not, add it to the list
+      if product_dict['id'] == id:
+        product_dict['quantity']+=1
+        break
+      counter+=1
+      if counter == len(list_of_products):
+        list_of_products.append(product)
+        break
+  
   session['cart'] = list_of_products
   print(session['cart'])
-  return redirect('/')
+  return redirect('/#yoga-products')
   #return json.dumps({'status':'OK','cart':session['cart']})
 
-
+def update_cart():
+  print(request.form)
+  print(session['cart'])
+  list_of_cart_items = session['cart']
+  for form_item in request.form:
+    for cart_item in list_of_cart_items:
+      if cart_item['id'] == form_item:
+        cart_item['quantity'] = int(request.form[form_item])
+        if cart_item['quantity'] == 0:
+          list_of_cart_items.remove(cart_item)
+  
+  session['cart'] = list_of_cart_items
+  return redirect('/')
 # def add_dojo():
 #   #print(request.form)
 #   instance_of_dojo = Dojos(
