@@ -7,7 +7,12 @@ import json
 def landing():
   #select all the products and display them on the page
   #select all the services and display them on the page
-  list_of_all_products = Product.query.all()
+  list_of_all_products = Product.query.all() 
+  if 'cart' in session:    
+    session['cart_total'] = 0                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                      
+    for item in session['cart']:
+      session['cart_total'] += item['quantity'] * item['unit_cost']
+
   return render_template('landing.html',all_products = list_of_all_products)
 
 def clear_session():
@@ -43,6 +48,7 @@ def add_to_cart(id):
   product = {
     'id':id,
     'name':instance_of_product.name,
+    'description':instance_of_product.descr,
     'unit_cost':instance_of_product.unit_cost,
     'quantity':1 #default quantity set to 1. 
   }

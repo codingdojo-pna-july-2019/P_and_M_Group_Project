@@ -108,8 +108,9 @@
           </p>        
           <hr>
           {% endfor %}
+          <h6>Cart Total: ${{session.cart_total}}</h6>
           <input type="submit" value="Update Cart" class="btn update">
-          <button type="button" class="btn checkout" href="/checkout">Checkout</button>
+          <button type="button" class="btn checkout"><a href="/view_cart">Checkout</a></button>
         </form>
         {% else %}
           <p>No items in cart!</p>

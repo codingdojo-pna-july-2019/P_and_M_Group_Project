@@ -9,3 +9,10 @@ form{
 form select{
   width:50px;
 }
+
+.update {
+  background-color: rgb(4, 128, 251);
+  width:100%;
+  margin-top:5px;
+  margin-bottom:15px;
+}
