@@ -3,7 +3,7 @@ from controller_functions import landing,my_account,view_order,login,login_regis
 app.add_url_rule("/", view_func=landing)
 app.add_url_rule("/my_account",view_func=my_account)
 app.add_url_rule("/view_order",view_func=view_order)
-app.add_url_rule("/logout",view_func=view_order)
+app.add_url_rule("/logout",view_func=logout)
 app.add_url_rule("/login",view_func=login,methods=['POST'])
 app.add_url_rule("/view_cart",view_func=view_cart)
 app.add_url_rule("/confirm_order",view_func=confirm_order)

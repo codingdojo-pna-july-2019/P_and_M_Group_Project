@@ -35,3 +35,6 @@ span{
   font-size:20px;
   font-weight:bold;
 }
+img{
+  max-height:100px;
+}

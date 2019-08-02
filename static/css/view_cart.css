@@ -8,6 +8,9 @@ form{
 form select{
   width:50px;
 }
+img {
+  max-height:200px;
+}
 
 .update {
   background-color: rgb(4, 128, 251);

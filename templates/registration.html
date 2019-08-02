@@ -10,7 +10,7 @@
     crossorigin="anonymous">
   <link rel="stylesheet" href="https://dhbhdrzi4tiry.cloudfront.net/cdn/sites/foundation.min.css">
   <link rel="stylesheet" type="text/css" media="screen" href="{{url_for('static',filename='css/registration.css')}}" />
-  <link rel="stylesheet" href="../static/css/registration.css">
+  <link rel="stylesheet" type="text/css" media="screen" href="{{url_for('static',filename='css/cart_popup.css')}}" />
   <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.4.1/jquery.min.js"></script>
   <script src="{{url_for('static',filename='js/main.js')}}"></script>
 </head>
@@ -159,14 +159,9 @@
       </div>
     </div>
   </div>
-
+  <script src="https://code.jquery.com/jquery-2.1.4.min.js"></script>
+  <script src="https://dhbhdrzi4tiry.cloudfront.net/cdn/sites/foundation.js"></script>
+  <script>$(document).foundation();</script>
+  <script src="{{url_for('static',filename='js/cart_popup.js')}}"></script>  
 </body>
-<script>
-  function openCart() {
-    document.getElementById("my-cart").style.display = "block";
-  }
-  function closeCart() {
-    document.getElementById("my-cart").style.display = "none";
-  }
-</script>
 </html>

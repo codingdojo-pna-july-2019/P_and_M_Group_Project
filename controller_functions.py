@@ -29,12 +29,12 @@ def login_register():
 def login():
   is_valid=True
   #get form info
-  email = request.form['email'].lower()
+  form_email = request.form['email'].lower()
 
   if len(request.form['password'])<1:
     flash('Password cannot be blank.')
     is_valid = False
-  if len(email)<1:
+  if len(form_email)<1:
     flash('Email cannot be blank.')
     is_valid = False
   if is_valid == True:
@@ -48,8 +48,8 @@ def login():
     else:#check if password matches
       if bcrypt.check_password_hash(instance_of_user.pw,request.form['password']) == True:
         print('password matched')
-        session['user_email'] = email
-        session['first_name'] = instance_of_user.fn
+        session['user_email'] = form_email
+        session['first_name'] = instance_of_user.f_name
         session['id'] = instance_of_user.id
         return redirect('/my_account')
       else:
@@ -122,6 +122,7 @@ def add_to_cart(id):
     'name':instance_of_product.name,
     'description':instance_of_product.descr,
     'unit_cost':instance_of_product.unit_cost,
+    'img_file':instance_of_product.img_file,
     'quantity':1 #default quantity set to 1. 
   }
   #add products to the session

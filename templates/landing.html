@@ -6,7 +6,7 @@
     <meta http-equiv="X-UA-Compatible" content="IE=edge" />
     <title>Yoga Store | Welcome</title>
     <link rel="stylesheet" href="{{url_for('static',filename='css/landing.css')}}">
-    <link rel="stylesheet" href="../static/css/landing.css">
+    <link rel="stylesheet" type="text/css" media="screen" href="{{url_for('static',filename='css/cart_popup.css')}}" />
     <link rel="stylesheet" href="https://dhbhdrzi4tiry.cloudfront.net/cdn/sites/foundation.min.css">
    
   </head>
@@ -30,7 +30,7 @@
           <li><a href="/my_account">My Account</a></li>
           <li><a href="/logout">Logout</a></li>
           {% else %}
-          <li><a href="/login">Login|Register</a></li>
+          <li><a href="/login_register">Login|Register</a></li>
           <li><a href="/clear_session">Clear Session</a></li>
           {% endif %}
           <li><button type="button" class="open-button" onclick="openCart()">View Cart</button></li>
@@ -275,32 +275,9 @@
 
     <script src="https://code.jquery.com/jquery-2.1.4.min.js"></script>
     <script src="https://dhbhdrzi4tiry.cloudfront.net/cdn/sites/foundation.js"></script>
-    <script>
-      $(document).foundation();
-    </script>
-    <script
-    src="https://www.paypal.com/sdk/js?client-id=AdQRFW9SyfvciiVeF5oeOWosrOuz1qAdMi0Lguu9rT8MxDya68zQZiQGljosQkIXT9e197qV120VSjre">
-    </script>
-    <script>
-        paypal.Buttons({
-          createOrder: function(data, actions) {
-            // Set up the transaction
-            return actions.order.create({
-              purchase_units: [{
-                amount: {value: '0.01'}
-              }]
-            });
-          }
-        }).render('#paypal-button-container');
-      </script>
-      <!--<script src="{{url_for('static',filename='js/landing.js')}}"></script>-->
-      <script>
-      function openCart(){
-        document.getElementById("my-cart").style.display = "block";
-      }
-      function closeCart(){
-        document.getElementById("my-cart").style.display = "none";
-      }
-      </script>
+    <script>$(document).foundation();</script>
+    <script src="https://www.paypal.com/sdk/js?client-id=AdQRFW9SyfvciiVeF5oeOWosrOuz1qAdMi0Lguu9rT8MxDya68zQZiQGljosQkIXT9e197qV120VSjre"></script>
+    <script src="{{url_for('static',filename='js/paypal.js')}}"></script>
+    <script src="{{url_for('static',filename='js/cart_popup.js')}}"></script>
   </body>
 </html>

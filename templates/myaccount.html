@@ -10,7 +10,7 @@
     crossorigin="anonymous">
   <link rel="stylesheet" href="https://dhbhdrzi4tiry.cloudfront.net/cdn/sites/foundation.min.css">
   <link rel="stylesheet" type="text/css" media="screen" href="{{url_for('static',filename='css/myaccount.css')}}" />
-  <link rel="stylesheet" href="../static/css/myaccount.css">
+  <link rel="stylesheet" type="text/css" media="screen" href="{{url_for('static',filename='css/cart_popup.css')}}" />
   <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.4.1/jquery.min.js"></script>
   <script src="{{url_for('static',filename='js/main.js')}}"></script>
   <script src="../static/js/main.js"></script>
@@ -28,16 +28,14 @@
       <ul class="menu">
         <!--<li><a href="#">One</a></li>
     <li><a href="#">Two</a></li>-->
-        <li>
-          <a href="/myaccount/{{session.id}}">Welcome, {{session.first_name}}</a>
-        </li>
+        <li>Welcome, {{session.first_name}}</li>
         <li>
           <a href="/logout">Logout</a>
         </li>
         <li>
           <a href="/">Home</a>
         </li>
-        <li><a href="#">Cart</a></li>
+        <li><button type="button" class="open-button" onclick="openCart()">View Cart</button></li>
       </ul>
     </div>
   </div>
@@ -154,6 +152,31 @@
       </tbody>
     </table>
   </div>
+
+<div id="my-cart" class="popup">
+  <div id="cart-container">
+    {% if session.cart|length > 0 %}
+    <form action="/update_cart" method="POST">
+      {% for item in session.cart %}
+      <p>
+        <h6>{{item.name}} </h6>
+        <h6>${{item.quantity * item.unit_cost}}</h6>
+        <label for="{{item.id}}">Quantity</label>
+        <input type="number" name="{{item.id}}" id="{{item.id}}" class="cart-item form-control" value="{{item.quantity}}" min="0">
+      </p>
+      <hr> {% endfor %}
+      <h6>Cart Total: ${{session.cart_total}}</h6>
+      <input type="submit" value="Update Cart" class="btn update">
+      <button type="button" class="btn checkout">
+        <a href="/view_cart">Checkout</a>
+      </button>
+    </form>
+    {% else %}
+    <p>No items in cart!</p>
+    {% endif %}
+    <button type="button" class="btn cancel" onclick="closeCart()">Close</button>
+  </div>
+</div>
   <div class="callout large secondary">
     <div class="row">
       <div class="large-4 columns">
@@ -180,5 +203,5 @@
   </div>
 
 </body>
-
+<script src="{{url_for('static',filename='js/cart_popup.js')}}"></script>
 </html>
