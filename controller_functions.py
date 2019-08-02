@@ -1,6 +1,6 @@
-from flask import render_template, redirect, request, session	# we now need fewer imports because we're not doing everything in this file!
+from flask import render_template, redirect, request, session, flash	# we now need fewer imports because we're not doing everything in this file!
 # if we need to work with the database, we'll need those imports:    
-from config import db
+from config import db, bcrypt
 from models import User, Order, Product, orders_products_table
 import json
 
@@ -21,6 +21,43 @@ def clear_session():
 
 def login():
   return render_template('registration.html')
+
+def register():
+  is_valid=True
+  #get form info
+  fn = request.form['first_name']
+  ln = request.form['last_name']
+  pw = request.form['password']
+  cpw = request.form['confirm_password']
+  form_email = request.form['email'].lower()
+
+  if len(fn)<1:
+    flash('First Name must be filled in.')
+    is_valid = False
+  if len(ln)<1:
+    flash('Last Name must be filled in.')
+    is_valid = False
+  if is_valid == True:
+    #check if email is registered
+    instance_of_user = User.query.filter_by(email=form_email).first()
+    print(instance_of_user)
+    
+    if instance_of_user is not None:
+      flash('Email already registered. Please login.')
+      return redirect('/login')
+    
+    #if email not registered, add the user to the db
+    pw_hash = bcrypt.generate_password_hash(pw)
+    flash('Successfully added new user!')
+
+    new_instance_of_a_user = User(f_name=fn, l_name=ln, email=form_email, pw=pw_hash)
+    db.session.add(new_instance_of_a_user)
+    db.session.commit()
+    session['user_email'] = form_email
+    session['first_name'] = fn
+    instance_of_user = User.query.filter_by(email=form_email).first()
+    session['id'] = instance_of_user.id
+  return redirect('/my_account')
 
 def my_account():
   return render_template('myaccount.html')
