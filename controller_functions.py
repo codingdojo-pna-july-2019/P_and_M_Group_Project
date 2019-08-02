@@ -19,8 +19,43 @@ def clear_session():
   session.clear()
   return redirect('/')
 
+def logout():
+  session.clear()
+  return redirect('/')
+
+def login_register():
+  return render_template('/registration.html')
+
 def login():
-  return render_template('registration.html')
+  is_valid=True
+  #get form info
+  email = request.form['email'].lower()
+
+  if len(request.form['password'])<1:
+    flash('Password cannot be blank.')
+    is_valid = False
+  if len(email)<1:
+    flash('Email cannot be blank.')
+    is_valid = False
+  if is_valid == True:
+    #see if user is already registered
+    instance_of_user = User.query.filter_by(email=form_email).first()
+    print(instance_of_user)
+    
+    if instance_of_user is None:
+      flash('Email does not match a registered user')
+      return redirect('/login_register')
+    else:#check if password matches
+      if bcrypt.check_password_hash(instance_of_user.pw,request.form['password']) == True:
+        print('password matched')
+        session['user_email'] = email
+        session['first_name'] = instance_of_user.fn
+        session['id'] = instance_of_user.id
+        return redirect('/my_account')
+      else:
+        flash('Password or email is incorrect.')
+        return redirect('/login_register')
+  return redirect('/')
 
 def register():
   is_valid=True
