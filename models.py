@@ -33,6 +33,7 @@ class Order(db.Model):
   cost = db.Column(db.Integer)
   paypal_orders_id = db.Column(db.Integer)
   user = db.relationship("User",back_populates="order")
+  shipping = db.relationship("Shipping",back_populates="order")
   products_in_this_order = db.relationship("Product",secondary=orders_products_table,back_populates="orders_containing_this_product")
   created_at = db.Column(DateTime, server_default=func.now())
   updated_at = db.Column(DateTime, server_default=func.now(), onupdate=func.now())
@@ -57,7 +58,8 @@ class Shipping(db.Model):
   city = db.Column(String(45))
   state = db.Column(String(45))
   zip_code = db.Column(String(45))
-  orders_containing_this_product = db.relationship("Order",secondary=orders_products_table,back_populates="products_in_this_order")
+  order_id = db.Column(db.Integer, db.ForeignKey('orders.id'))
+  order = db.relationship("Order",back_populates="shipping")
   created_at = db.Column(DateTime, server_default=func.now())
   updated_at = db.Column(DateTime, server_default=func.now(), onupdate=func.now())
 
