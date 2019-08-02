@@ -1,5 +1,5 @@
 from config import app
-from controller_functions import landing,my_account,view_order,login,login_register,logout,view_cart,confirm_order,place_order,add_to_cart,clear_session,update_cart,update_cart_checkout,place_order,register
+from controller_functions import landing,my_account,view_order,login,login_register,logout,view_cart,confirm_order,add_to_cart,clear_session,update_cart,update_cart_checkout,place_order,register
 app.add_url_rule("/", view_func=landing)
 app.add_url_rule("/my_account",view_func=my_account)
 app.add_url_rule("/view_order",view_func=view_order)
