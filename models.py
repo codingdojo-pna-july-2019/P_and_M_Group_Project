@@ -48,6 +48,19 @@ class Product(db.Model):
   created_at = db.Column(DateTime, server_default=func.now())
   updated_at = db.Column(DateTime, server_default=func.now(), onupdate=func.now())
 
+class Shipping(db.Model):
+  __tablename__ = "shippings"
+  id = db.Column(db.Integer, primary_key=True)
+  first_name = db.Column(String(45))
+  last_name = db.Column(String(45))
+  street = db.Column(String(45))
+  city = db.Column(String(45))
+  state = db.Column(String(45))
+  zip_code = db.Column(String(45))
+  orders_containing_this_product = db.relationship("Order",secondary=orders_products_table,back_populates="products_in_this_order")
+  created_at = db.Column(DateTime, server_default=func.now())
+  updated_at = db.Column(DateTime, server_default=func.now(), onupdate=func.now())
+
 # class Orders_Products(db.Model):
 #   __db.Tablename__ = "order_products"
 #   id = db.db.Column(db.db.Integer, primary_key=True)

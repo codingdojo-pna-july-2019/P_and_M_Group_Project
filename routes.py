@@ -12,6 +12,10 @@ app.add_url_rule("/clear_session",view_func=clear_session)
 app.add_url_rule("/update_cart",view_func=update_cart,methods=["POST"])
 app.add_url_rule("/update_cart_checkout",view_func=update_cart_checkout,methods=['POST'])
 app.add_url_rule('/place_order',view_func=place_order)
+
+app.add_url_rule('/secret_url',view_func=place_order) #Paul Change
+
+
 app.add_url_rule('/register',view_func=register,methods=['POST'])
 app.add_url_rule('/melissas_route',view_func=melissas_route)
 app.add_url_rule('/new_route',view_func=new_route)
