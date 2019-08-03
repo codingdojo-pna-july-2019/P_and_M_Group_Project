@@ -12,7 +12,7 @@
   <link rel="stylesheet" type="text/css" media="screen" href="{{url_for('static',filename='css/view_cart.css')}}" />
   <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.4.1/jquery.min.js"></script>
   <script src="{{url_for('static',filename='js/main.js')}}"></script>
-  <script src="../static/js/main.js"></script>
+  <script src="https://www.paypalobjects.com/api/checkout.js"></script>
 </head>
 
 <body>
@@ -47,13 +47,11 @@
     </div>
   </div>
 
-  <div class="row column text-center">
-    <h2>Items</h2>
-  </div>
-  <hr>
-
   <div class="row small-up-2 ordered-item">
+    <div class="column">
     <form  action="/update_cart_checkout" method="POST">
+      <h1>Items</h1>
+      <hr>
       {% for item in session.cart %}
       <div class="column">
         <h6><span>Name:</span><a href="/view_item/item.id">{{item.name}}</a></h6>
@@ -67,18 +65,48 @@
     </div>
     <hr>
     {% endfor %}
-    <div class="row column text-center">
+    <div class="row">
       <h3><span>Order Total: </span> ${{session.cart_total}}</h3>
+      <input type="submit" value="Update Cart" class="btn update">
     </div>
-    <input type="submit" value="Proceed to Checkout" class="btn update">
   </form>
   </div>
 
-  <hr>
-
-  <div class="row column text-center">
-    <h5><span><a href="/confirm_order">Continue to place order and enter shipping details</a></span></h5>
+  <div class="column">
+      <form action="/add_shipping" method="POST" id='shipping-form'>
+        <h1>Shipping Information</h1>
+        <hr>
+        <p>
+          <label for="fn">First Name</label>
+          <input type="text" name="first_name" id="fn" class="form-control">
+        </p>
+        <p>
+          <label for="ln">Last Name</label>
+          <input type="text" name="last_name" id="ln" class="form-control">
+        </p>
+        <p>
+          <label for="street">Street Address</label>
+          <input type="text" name="street" id="street" class="form-control">
+        </p>
+        <p>
+          <label for="city">City</label>
+          <input type="text" name="city" id="city" class="form-control">
+        </p>
+        <p>
+          <label for="states">State</label>
+          <input type="text" name="state" id="state" class="form-control">
+        </p>
+        <p>
+          <label for="zip_code">Zip Code</label>
+          <input type="text" name="zip_code" id="zip_code" class="form-control">
+        </p>
+        <p>
+          <input type="submit" class="btn update" value="Update Cart and Proceed to Checkout with PayPal" id="btnSubmit">
+        </p>
+      </form>
+    </div>
   </div>
+
   <hr>
 
   <div class="callout large secondary">
@@ -111,6 +139,7 @@
   <script src="https://www.paypal.com/sdk/js?client-id=AdQRFW9SyfvciiVeF5oeOWosrOuz1qAdMi0Lguu9rT8MxDya68zQZiQGljosQkIXT9e197qV120VSjre"></script>
   <script src="{{url_for('static',filename='js/paypal.js')}}"></script>
   <script src="{{url_for('static',filename='js/cart_popup.js')}}"></script>  
+
 </body>
 
 </html>

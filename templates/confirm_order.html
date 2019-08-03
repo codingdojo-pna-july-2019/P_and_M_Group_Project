@@ -107,8 +107,8 @@
             <h6><span>Name:</span><a href="/view_item/item.id">{{item.name}}</a></h6>
             <h6><span>Description:</span> {{item.description}}</h6>
             <h6><span>Quantity:</span> {{item.quantity}}</h6>
-            <h6><span>Unit Cost:</span> {{item.unit_cost}}</h6>
-            <h6><span>Total Cost:</span>{{ item.unit_cost * item.quantity}}</h6>
+            <h6><span>Unit Cost:</span>${{item.unit_cost}}</h6>
+            <h6><span>Total Cost:</span>${{ item.unit_cost * item.quantity}}</h6>
           </div>
           <div class="column">
               <img class="thumbnail" src="{{url_for('static',filename='img/'+item.img_file)}}">
@@ -146,11 +146,45 @@
       </div>
     </div>
 
+    <div id="paypal-button"></div>
+
     <script src="https://code.jquery.com/jquery-2.1.4.min.js"></script>
     <script src="https://dhbhdrzi4tiry.cloudfront.net/cdn/sites/foundation.js"></script>
     <script>$(document).foundation();</script>
     <script src="https://www.paypal.com/sdk/js?client-id=AdQRFW9SyfvciiVeF5oeOWosrOuz1qAdMi0Lguu9rT8MxDya68zQZiQGljosQkIXT9e197qV120VSjre"></script>
     <script src="{{url_for('static',filename='js/paypal.js')}}"></script>
     <script src="{{url_for('static',filename='js/cart_popup.js')}}"></script>
+
+    
+        
+        <script>
+          paypal.Button.render({
+            env: 'sandbox', // Or 'production'
+            // Set up the payment:
+            // 1. Add a payment callback
+            payment: function(data, actions) {
+              // 2. Make a request to your server
+              return actions.request.post('/my-api/create-payment/')
+                .then(function(res) {
+                  // 3. Return res.id from the response
+                  return res.id;
+                });
+            },
+            // Execute the payment:
+            // 1. Add an onAuthorize callback
+            onAuthorize: function(data, actions) {
+              // 2. Make a request to your server
+              return actions.request.post('/my-api/execute-payment/', {
+                paymentID: data.paymentID,
+                payerID:   data.payerID
+              })
+                .then(function(res) {
+                  // 3. Show the buyer a confirmation message.
+                });
+            }
+          }, '#paypal-button');
+        </script>
+
+
   </body>
 </html>

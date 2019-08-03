@@ -4,9 +4,13 @@ span{
 }
 form{
   display:inline-block;
+  height:100%;
 }
 form select{
   width:50px;
+}
+#shipping-form{
+  padding-left:20px;
 }
 img {
   max-height:200px;
@@ -17,4 +21,5 @@ img {
   width:100%;
   margin-top:5px;
   margin-bottom:15px;
+  vertical-align:bottom;
 }

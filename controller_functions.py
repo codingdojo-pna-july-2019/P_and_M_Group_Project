@@ -1,8 +1,54 @@
-from flask import render_template, redirect, request, session, flash	# we now need fewer imports because we're not doing everything in this file!
+from flask import render_template, redirect, request, session, flash, jsonify	# we now need fewer imports because we're not doing everything in this file!
 # if we need to work with the database, we'll need those imports:    
 from config import db, bcrypt
 from models import User, Order, Product, orders_products_table
 import json
+import paypalrestsdk
+paypalrestsdk.configure({
+  "mode": "sandbox", # sandbox or live
+  "client_id": "AdQRFW9SyfvciiVeF5oeOWosrOuz1qAdMi0Lguu9rT8MxDya68zQZiQGljosQkIXT9e197qV120VSjre",
+  "client_secret": "EL722lqZPZBGY-x85jrjsg1SZGESCHu27HP7pz8754sa5dDLlFNMFehC8BLcMtM1xC6Wf7kIOLhuKv5c" })
+
+def create_payment():
+
+  payment = paypalrestsdk.Payment({
+    "intent": "sale",
+    "payer": {
+      "payment_method": "paypal"},
+    "redirect_urls": {
+      "return_url": "http://localhost:3000/payment/execute", #change these routes
+      "cancel_url": "http://localhost:3000/"}, #change these routes
+    "transactions": [{
+      "item_list": {
+          "items": [{
+            "name": "item", #change item to items from the cart
+            "sku": "item",
+            "price": session['cart_total'], #change price to the prices of our items
+            "currency": "USD", #leave this
+            "quantity": 1}]}, #change quantities to match what's in the cart
+      "amount": {
+        "total": session['cart_total'],
+        "currency": "USD"},
+      "description": "This is the payment transaction description."}]})
+  if payment.create():
+    print('payment success')
+  else:
+    print(payment.error)
+
+  return jsonify({'paymentID':payment.id})
+
+def execute_payment():
+  success = False
+  payment = paypalrestsdk.Payment.find(request.form['paymentID'])
+
+  if payment.execute({'payer_id': request.form['payerID']}):
+    print("execute success")
+    success = True
+  else:
+    print(payment.error)
+
+  return jsonify({'success':success})
+
 
 def landing():
   #select all the products and display them on the page
@@ -103,9 +149,6 @@ def view_order():
 def view_cart():
   return render_template('view_cart.html')
 
-def confirm_order():
-  return render_template('confirm_order.html')
-
 def place_order():
   return render_template('place_order.html')
 
@@ -172,12 +215,20 @@ def update_cart_checkout():
         cart_item['quantity'] = int(request.form[form_item])
         if cart_item['quantity'] == 0:
           list_of_cart_items.remove(cart_item)
-  
+
   session['cart'] = list_of_cart_items
+
+  #get the cart total
+  if 'cart' in session:    
+    session['cart_total'] = 0                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                      
+    for item in session['cart']:
+      session['cart_total'] += item['quantity'] * item['unit_cost']
+
+  return redirect('/view_cart')
+
+def update_cart_and_shipping_checkout():
   return redirect('/place_order')
 
-def place_order():
-  return render_template('/confirm_order.html')
 # def add_dojo():
 #   #print(request.form)
 #   instance_of_dojo = Dojos(
