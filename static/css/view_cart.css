@@ -4,7 +4,6 @@ span{
 }
 form{
   display:inline-block;
-  height:100%;
 }
 form select{
   width:50px;
@@ -15,11 +14,42 @@ form select{
 img {
   max-height:200px;
 }
-
 .update {
   background-color: rgb(4, 128, 251);
   width:100%;
   margin-top:5px;
   margin-bottom:15px;
   vertical-align:bottom;
+  border-radius:0px;
+}
+#wrapper{
+  background-color:rgb(217, 217, 217);
+}
+#messages{
+  margin:8px;
+  font-size: 13px;
+  color:red;
+}
+#messages p{
+  height:16px;
+  margin:0px;
+}
+.hidden {
+  display:none;
+}
+#return{
+  position:fixed;
+  width:50%;
+  top:25%;
+  left:25%;
+  z-index: 9;
+  background-color:white;
+}
+#shipping{
+  border: 3px solid rgb(124, 124, 124);
+  padding:5%;
+  width:100%;
+}
+.radio{
+  padding-right:10px;
 }

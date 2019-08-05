@@ -11,8 +11,13 @@
   <link rel="stylesheet" href="https://dhbhdrzi4tiry.cloudfront.net/cdn/sites/foundation.min.css">
   <link rel="stylesheet" type="text/css" media="screen" href="{{url_for('static',filename='css/view_cart.css')}}" />
   <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.4.1/jquery.min.js"></script>
-  <script src="{{url_for('static',filename='js/main.js')}}"></script>
+  <script src="{{url_for('static',filename='js/shipping.js')}}"></script>
   <script src="https://www.paypalobjects.com/api/checkout.js"></script>
+  <script src="{{url_for('static',filename='js/validate-shipping.js')}}"></script>  
+
+  <script type="text/javascript" src="http://ajax.googleapis.com/ajax/libs/jquery/1.7.2/jquery.min.js"></script>
+  <script src="http://ajax.aspnetcdn.com/ajax/jquery.ui/1.8.9/jquery-ui.js" type="text/javascript"></script>
+  <link href="http://ajax.aspnetcdn.com/ajax/jquery.ui/1.8.9/themes/blitzer/jquery-ui.css" rel="stylesheet" type="text/css" />
 </head>
 
 <body>
@@ -46,6 +51,25 @@
       <h1>Cart Details</h1>
     </div>
   </div>
+  <div id="messages">
+    <p class='fn hidden'>Please enter a first name.</p>
+    <p class='ln hidden'>Please enter a last name.</p>
+    <p class='street1 hidden'>Please enter a valid street address.</p>
+    <p class='street2 hidden'>Please enter a valid street address.</p>
+    <p class='city hidden'>Please enter a city.</p>
+    <p class='zip_code hidden'>Please enter a vaid zip code.</p>
+    <div class='flash-messages'>
+      {% with messages = get_flashed_messages() %}
+      <!-- declare a variable called messages -->
+      {% if messages %}
+      <!-- check if there are any messages -->
+      {% for message in messages %}
+      <!-- loop through the messages -->
+      <p>{{message}}</p>
+      <!-- display each message in a paragraph tag -->
+      {% endfor %} {% endif %} {% endwith %}
+    </div>
+  </div>
 
   <div class="row small-up-2 ordered-item">
     <div class="column">
@@ -73,7 +97,10 @@
   </div>
 
   <div class="column">
-      <form action="/add_shipping" method="POST" id='shipping-form'>
+      <!--<form action="/update_cart_and_shipping_checkout" method="POST" id='shipping-form'>-->
+      <!--<form action="/address_validation" method="POST" id='shipping-form'>-->
+        <form id="shipping-form">
+        <form>
         <h1>Shipping Information</h1>
         <hr>
         <p>
@@ -85,29 +112,35 @@
           <input type="text" name="last_name" id="ln" class="form-control">
         </p>
         <p>
-          <label for="street">Street Address</label>
-          <input type="text" name="street" id="street" class="form-control">
+          <label for="street1">Street1 Address</label>
+          <input type="text" name="street1" id="street1" class="form-control">
+        </p>
+        <p>
+          <label for="street2">Street2 Address</label>
+          <input type="text" name="street2" id="street2" class="form-control">
         </p>
         <p>
           <label for="city">City</label>
           <input type="text" name="city" id="city" class="form-control">
         </p>
         <p>
-          <label for="states">State</label>
+          <label for="state">State</label>
           <input type="text" name="state" id="state" class="form-control">
         </p>
         <p>
           <label for="zip_code">Zip Code</label>
           <input type="text" name="zip_code" id="zip_code" class="form-control">
         </p>
-        <p>
-          <input type="submit" class="btn update" value="Update Cart and Proceed to Checkout with PayPal" id="btnSubmit">
-        </p>
       </form>
+      <button id="postBtn" class='btn update'>Proceed to Checkout</button>
     </div>
   </div>
 
   <hr>
+
+  <div id="address-validation">
+    <div id="return"></div>
+  </div>
 
   <div class="callout large secondary">
     <div class="row">
@@ -139,7 +172,23 @@
   <script src="https://www.paypal.com/sdk/js?client-id=AdQRFW9SyfvciiVeF5oeOWosrOuz1qAdMi0Lguu9rT8MxDya68zQZiQGljosQkIXT9e197qV120VSjre"></script>
   <script src="{{url_for('static',filename='js/paypal.js')}}"></script>
   <script src="{{url_for('static',filename='js/cart_popup.js')}}"></script>  
+  <script src="{{url_for('static',filename='js/shipping_popup.js')}}"></script>  
+  <script>
+  $(document).ready(function(){
+    $('#postBtn').click(function(){
+      var data = $('#shipping-form').serialize();
+      $('#paramsSent').html(data);
 
+      $.ajax({
+        method: "POST",
+        url: "/address_validation",
+        data: data
+      })
+      .done(function(res){
+        $('#return').html(res);
+      });
+    });
+  });
+  </script>
 </body>
-
 </html>

@@ -1,16 +1,38 @@
 from flask import render_template, redirect, request, session, flash, jsonify	# we now need fewer imports because we're not doing everything in this file!
 # if we need to work with the database, we'll need those imports:    
 from config import db, bcrypt
-from models import User, Order, Product, orders_products_table
-import json
-import paypalrestsdk
+from models import User, Order, Product, Shipping, orders_products_table
+import json, os, paypalrestsdk
+
+from smartystreets_python_sdk import StaticCredentials, exceptions, ClientBuilder
+from smartystreets_python_sdk.us_street import Lookup
+
 paypalrestsdk.configure({
   "mode": "sandbox", # sandbox or live
   "client_id": "AdQRFW9SyfvciiVeF5oeOWosrOuz1qAdMi0Lguu9rT8MxDya68zQZiQGljosQkIXT9e197qV120VSjre",
   "client_secret": "EL722lqZPZBGY-x85jrjsg1SZGESCHu27HP7pz8754sa5dDLlFNMFehC8BLcMtM1xC6Wf7kIOLhuKv5c" })
 
-def create_payment():
+def update_cart_function():
+  list_of_cart_items = session['cart']
+  for form_item in request.form:
+    for cart_item in list_of_cart_items:
+      if cart_item['id'] == form_item:
+        cart_item['quantity'] = int(request.form[form_item])
+        if cart_item['quantity'] == 0:
+          list_of_cart_items.remove(cart_item)
 
+  session['cart'] = list_of_cart_items
+  #no return needed
+
+def cart_total():
+  #get the cart total
+  if 'cart' in session:    
+    session['cart_total'] = 0                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                      
+    for item in session['cart']:
+      session['cart_total'] += item['quantity'] * item['unit_cost']
+  #no return needed
+
+def create_payment():
   payment = paypalrestsdk.Payment({
     "intent": "sale",
     "payer": {
@@ -44,21 +66,20 @@ def execute_payment():
   if payment.execute({'payer_id': request.form['payerID']}):
     print("execute success")
     success = True
+
+    #commit order to the DB
+
+
   else:
     print(payment.error)
 
   return jsonify({'success':success})
 
-
 def landing():
   #select all the products and display them on the page
   #select all the services and display them on the page
   list_of_all_products = Product.query.all() 
-  if 'cart' in session:    
-    session['cart_total'] = 0                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                      
-    for item in session['cart']:
-      session['cart_total'] += item['quantity'] * item['unit_cost']
-
+  cart_total() #call the cart_total function
   return render_template('landing.html',all_products = list_of_all_products)
 
 def clear_session():
@@ -185,49 +206,106 @@ def add_to_cart(id):
         list_of_products.append(product)
         break
   
-  session['cart'] = list_of_products
-  print(session['cart'])
+  session['cart'] = list_of_products 
+  cart_total() #call the cart_total function
   return redirect('/#yoga-products')
-  #return json.dumps({'status':'OK','cart':session['cart']})
 
 def update_cart():
-  print(request.form)
-  print(session['cart'])
-  list_of_cart_items = session['cart']
-  for form_item in request.form:
-    for cart_item in list_of_cart_items:
-      if cart_item['id'] == form_item:
-        cart_item['quantity'] = int(request.form[form_item])
-        if cart_item['quantity'] == 0:
-          list_of_cart_items.remove(cart_item)
-  
-  session['cart'] = list_of_cart_items
+  update_cart_function() #call the update_cart_function
+  cart_total() #call the cart_total function
   return redirect('/')
 
 def update_cart_checkout():
-  #do the same thing as update_cart() but redirect to the place order page
-  print(request.form)
-  print(session['cart'])
-  list_of_cart_items = session['cart']
-  for form_item in request.form:
-    for cart_item in list_of_cart_items:
-      if cart_item['id'] == form_item:
-        cart_item['quantity'] = int(request.form[form_item])
-        if cart_item['quantity'] == 0:
-          list_of_cart_items.remove(cart_item)
-
-  session['cart'] = list_of_cart_items
-
-  #get the cart total
-  if 'cart' in session:    
-    session['cart_total'] = 0                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                      
-    for item in session['cart']:
-      session['cart_total'] += item['quantity'] * item['unit_cost']
-
+  #do the same thing as update_cart() but redirect to the view cart page
+  update_cart_function() #call the update_cart_function
+  cart_total() #call the cart_total function
   return redirect('/view_cart')
 
+
 def update_cart_and_shipping_checkout():
+  update_cart_function() #call the update_cart_function
+  cart_total() #call the cart_total function
+
+  #validate the shipping information and add it to the DB
+  session['shipping_address'] = request.form['address']
+  print(session['shipping_address'])
+
+  #should probably check if the shipping already exists before commiting it
+  instance_of_shippings = Shipping.query.filter_by(address=session['shipping_address'], first_name=session['shipping_fn'], last_name=session['shipping_ln']).first()
+
+  print(instance_of_shippings)
+
+  if instance_of_shippings is None:
+    print('instance of shippings was none')
+    #add the shipping address to the DB
+    new_shipping_instance = Shipping(first_name=session['shipping_fn'], last_name=session['shipping_ln'], address=session['shipping_address'])
+    db.session.add(new_shipping_instance)
+    db.session.commit()
+
   return redirect('/place_order')
+
+def address_validation():
+  found = True
+  # We recommend storing your secret keys in environment variables instead---it's safer!
+  auth_id = os.environ['SMARTY_AUTH_ID']
+  auth_token = os.environ['SMARTY_AUTH_TOKEN']
+  session['shipping_fn'] = request.form['first_name']
+  session['shipping_ln'] = request.form['last_name']
+  input_address = {
+    'street':request.form['street1']+' '+request.form['street2'],
+    'city':request.form['city'],
+    'state':request.form['state'],
+    'zip':request.form['zip_code']
+  }
+
+  credentials = StaticCredentials(auth_id, auth_token)
+
+  client = ClientBuilder(credentials).build_us_street_api_client()
+  # client = ClientBuilder(credentials).with_custom_header({'User-Agent': 'smartystreets (python@0.0.0)', 'Content-Type': 'application/json'}).build_us_street_api_client()
+  # client = ClientBuilder(credentials).with_proxy('localhost:8080', 'user', 'password').build_us_street_api_client()
+  # Uncomment the line above to try it with a proxy instead
+
+  # Documentation for input fields can be found at:
+  # https://smartystreets.com/docs/us-street-api#input-fields
+
+  lookup = Lookup()
+  #lookup.input_id = "24601"  # Optional ID from your system
+  lookup.addressee = request.form['first_name']+' '+request.form['last_name']
+  lookup.street = request.form['street1']
+  lookup.street2 = request.form['street2']
+  #lookup.secondary = "APT 2"
+  lookup.urbanization = ""  # Only applies to Puerto Rico addresses
+  lookup.city = request.form['city']
+  lookup.state = request.form['state']
+  lookup.zipcode = request.form['zip_code']
+  lookup.candidates = 3
+  lookup.match = "Invalid"  # "invalid" is the most permissive match
+
+  try:
+    client.send_lookup(lookup)
+  except exceptions.SmartyException as err:
+    print(err)
+    return
+
+  result = lookup.result
+
+  if not result:
+    found = False
+    print("No candidates. This means the address is not valid.")
+    flash('Address is not valid. Please re-enter shipping information.')
+    return render_template('partials/address.html', found=found)
+
+  #for output example fields here https://smartystreets.com/docs/cloud/us-street-api#http-response-status
+  first_candidate = result[0]
+
+  print("Address is valid. (There is at least one candidate)\n")
+  suggested_address_line1 = first_candidate.delivery_line_1
+  suggested_address_line2 = first_candidate.components.city_name+", "+first_candidate.components.state_abbreviation+" "+first_candidate.components.zipcode
+  print(first_candidate.delivery_line_1)
+  print(suggested_address_line1)
+  print(first_candidate.components.city_name+", "+first_candidate.components.state_abbreviation+" "+first_candidate.components.zipcode)
+  return render_template('partials/address.html', found=found,suggested_address_line1=suggested_address_line1,suggested_address_line2=suggested_address_line2,input_address=input_address)
+
 
 # def add_dojo():
 #   #print(request.form)

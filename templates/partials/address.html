@@ -1,0 +1,19 @@
+{% if found == True %}
+<form id="shipping" action="/update_cart_and_shipping_checkout" method="POST">
+  <h5><span>Validate Shipping Information:</span></h5>
+  <hr>
+  <div>
+    <p><span>Use Suggested Address:</span></p>
+    <p><input class="radio" type="radio" name="address" value="{{suggested_address_line1}}, {{suggested_address_line2}}" checked> {{suggested_address_line1}}, {{suggested_address_line2}}</p>
+    <p><span>Use Input Address:</span></p>
+    <p><input class="radio" type="radio" name="address" value="{{input_address.street}}, {{input_address.city}}, {{input_address.state}} {{input_address.zip}}"> {{input_address.street}}, {{input_address.city}}, {{input_address.state}} {{input_address.zip}}</p>
+    </div>
+    <input type="submit" value="Confirm Shipping and Proceed to Checkout" class="btn update">
+</form>
+{% endif %}
+{% if found == False %}
+<div id="shipping">
+  <p class="error">No addresses found.  Enter a valid address</p>
+  <a href="/view_cart">Close</a>
+</div>
+{% endif %}
