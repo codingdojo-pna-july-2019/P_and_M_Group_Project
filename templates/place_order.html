@@ -29,9 +29,9 @@
           <li><a href="/my_account">My Account</a></li>
           <li><a href="/logout">Logout</a></li>
           {% else %}
-          <li><a href="/login">Login|Register</a></li>
+          <li><a href="/login_register">Login|Register</a></li>
           {% endif %}
-          <li><a href="/cart">Cart</a></li>
+          <li><a href="/view_cart">Cart</a></li>
         </ul>
       </div>
     </div>
@@ -45,7 +45,7 @@
     </div>
     
     <div class="row column text-center">
-      <h3><span>Order Total: </span> $400</h3>
+      <h3><span>Order Total: </span> ${{session.cart_total}}</h3>
       <hr>
     </div>
 
