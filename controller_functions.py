@@ -305,32 +305,3 @@ def address_validation():
   print(suggested_address_line1)
   print(first_candidate.components.city_name+", "+first_candidate.components.state_abbreviation+" "+first_candidate.components.zipcode)
   return render_template('partials/address.html', found=found,suggested_address_line1=suggested_address_line1,suggested_address_line2=suggested_address_line2,input_address=input_address)
-
-
-# def add_dojo():
-#   #print(request.form)
-#   instance_of_dojo = Dojos(
-#     name=request.form['dojo_name'], 
-#     city=request.form['dojo_city'], 
-#     state = request.form['dojo_state']
-#     )
-#   print(type(instance_of_dojo))
-#   #print(instance_of_dojo)
-#   db.session.add(instance_of_dojo)
-#   db.session.commit()
-#   #all_dojos = Dojos.query.all()
-#   #print(all_dojos)
-#   return redirect('/')
-
-# def add_ninja():
-#   #print(request.form)
-#   instance_of_ninja = Ninjas(
-#     first_name=request.form['first_name'], 
-#     last_name=request.form['last_name'], 
-#     dojo_id = request.form['dojo']
-#     )
-#   #print(type(instance_of_ninja))
-#   #print(instance_of_ninja)
-#   db.session.add(instance_of_ninja)
-#   db.session.commit()
-#   return redirect('/')
