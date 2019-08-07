@@ -32,28 +32,38 @@ def cart_total():
       session['cart_total'] += item['quantity'] * item['unit_cost']
   #no return needed
 
+def success():
+  if 'cart' in session:
+    session.pop('cart')
+    session.pop('cart_total')
+  return render_template('success.html')
+
 def create_payment():
+  #create a new order
+  paypal_items = []
+  paypal_item = {}
+  for item in session['cart']:
+    paypal_item = {"name":item['name'],"sku":item['id'],"price":item['unit_cost'],"currency":"USD","quantity":item['quantity']}
+    paypal_items.append(paypal_item)
+
   payment = paypalrestsdk.Payment({
     "intent": "sale",
     "payer": {
       "payment_method": "paypal"},
     "redirect_urls": {
-      "return_url": "http://localhost:3000/payment/execute", #change these routes
-      "cancel_url": "http://localhost:3000/"}, #change these routes
+      "return_url": "http://localhost/success", #change these routes
+      "cancel_url": "http://localhost/place_order"}, #change these routes
     "transactions": [{
-      "item_list": {
-          "items": [{
-            "name": "item", #change item to items from the cart
-            "sku": "item",
-            "price": session['cart_total'], #change price to the prices of our items
-            "currency": "USD", #leave this
-            "quantity": 1}]}, #change quantities to match what's in the cart
+      "item_list": {"items": paypal_items}, #change quantities to match what's in the cart
       "amount": {
         "total": session['cart_total'],
         "currency": "USD"},
       "description": "This is the payment transaction description."}]})
   if payment.create():
     print('payment success')
+    for link in payment.links:
+      if link.method=="REDIRECT":
+        redirect_url = (link.href)
   else:
     print(payment.error)
 
@@ -66,18 +76,17 @@ def execute_payment():
   if payment.execute({'payer_id': request.form['payerID']}):
     print("execute success")
     success = True
-
     #commit order to the DB
-
 
   else:
     print(payment.error)
+    flash('There was an error when placing payment')
+    return redirect('/place_order')
 
   return jsonify({'success':success})
 
 def landing():
   #select all the products and display them on the page
-  #select all the services and display them on the page
   list_of_all_products = Product.query.all() 
   cart_total() #call the cart_total function
   return render_template('landing.html',all_products = list_of_all_products)
@@ -90,10 +99,15 @@ def logout():
   session.clear()
   return redirect('/')
 
-def login_register():
-  return render_template('/registration.html')
+def login_register(flag=0): #flag = 1 if the user is trying to place an order. otherwise flag is 0
+  print(flag)
+  if flag == '1':
+    flash('Please login to continue')
 
-def login():
+  return render_template('/registration.html',flag=flag)
+
+def login(flag=0):#flag = 1 if the user is trying to place an order. otherwise flag is 0
+  print(flag) #flag = 1 if the user is trying to place an order. otherwise flag is 0
   is_valid=True
   #get form info
   form_email = request.form['email'].lower()
@@ -107,24 +121,26 @@ def login():
   if is_valid == True:
     #see if user is already registered
     instance_of_user = User.query.filter_by(email=form_email).first()
-    print(instance_of_user)
     
     if instance_of_user is None:
       flash('Email does not match a registered user')
-      return redirect('/login_register')
+      return redirect('/login_register/'+str(flag))
     else:#check if password matches
       if bcrypt.check_password_hash(instance_of_user.pw,request.form['password']) == True:
         print('password matched')
         session['user_email'] = form_email
         session['first_name'] = instance_of_user.f_name
         session['id'] = instance_of_user.id
+        if flag=='1':
+          return redirect('/place_order')
         return redirect('/my_account')
       else:
         flash('Password or email is incorrect.')
-        return redirect('/login_register')
+        return redirect('/login_register/'+str(flag))
   return redirect('/')
 
-def register():
+def register(flag=0): #flag = 1 if the user is trying to place an order. otherwise flag is 0
+  print(flag)
   is_valid=True
   #get form info
   fn = request.form['first_name']
@@ -146,7 +162,7 @@ def register():
     
     if instance_of_user is not None:
       flash('Email already registered. Please login.')
-      return redirect('/login')
+      return redirect('/login_register/'+str(flag))
     
     #if email not registered, add the user to the db
     pw_hash = bcrypt.generate_password_hash(pw)
@@ -159,6 +175,8 @@ def register():
     session['first_name'] = fn
     instance_of_user = User.query.filter_by(email=form_email).first()
     session['id'] = instance_of_user.id
+    if flag=='1':
+      return redirect('/place_order')
   return redirect('/my_account')
 
 def my_account():
@@ -171,6 +189,8 @@ def view_cart():
   return render_template('view_cart.html')
 
 def place_order():
+  if 'id' not in session:
+    return redirect('/login_register/1')
   return render_template('place_order.html')
 
 def add_to_cart(id):
@@ -232,7 +252,6 @@ def update_cart_and_shipping_checkout():
 
   #should probably check if the shipping already exists before commiting it
   instance_of_shippings = Shipping.query.filter_by(address=session['shipping_address'], first_name=session['shipping_fn'], last_name=session['shipping_ln']).first()
-
   print(instance_of_shippings)
 
   if instance_of_shippings is None:
@@ -245,6 +264,7 @@ def update_cart_and_shipping_checkout():
   return redirect('/place_order')
 
 def address_validation():
+
   found = True
   # We recommend storing your secret keys in environment variables instead---it's safer!
   auth_id = os.environ['SMARTY_AUTH_ID']

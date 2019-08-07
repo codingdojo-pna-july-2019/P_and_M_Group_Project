@@ -3,7 +3,7 @@ console.log('working in jquery');
 
 setTimeout(function() {
   $('.flash-messages').hide();
-}, 1000); 
+}, 3000); 
 
 //$('#show-login').click(function(){
 //  $('#login-form').show();

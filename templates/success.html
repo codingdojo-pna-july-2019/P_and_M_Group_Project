@@ -4,20 +4,22 @@
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <meta http-equiv="X-UA-Compatible" content="IE=edge" />
-    <title>Yoga Store | Welcome</title>
+    <title>Yoga Store | Payment Successful</title>
+    <link rel="stylesheet" href="{{url_for('static',filename='css/landing.css')}}">
+    <link rel="stylesheet" type="text/css" media="screen" href="{{url_for('static',filename='css/cart_popup.css')}}" />
     <link rel="stylesheet" href="https://dhbhdrzi4tiry.cloudfront.net/cdn/sites/foundation.min.css">
-    <link rel="stylesheet" href="{{url_for('static',filename='css/place_order.css')}}">
-    <script src="https://www.paypalobjects.com/api/checkout.js"></script>
    
   </head>
   <body>
-
     
+
     <!-- Start Top Bar -->
+    <div class="top-bar-wrapper">
     <div class="top-bar">
       <div class="top-bar-left">
         <ul class="menu">
           <li class="menu-text">Yoga Store</li>
+          <!--<li><a href="#yoga-services">Services</a></li>-->
         </ul>
       </div>
       <div class="top-bar-right">
@@ -27,57 +29,52 @@
           <li><a href="/my_account">My Account</a></li>
           <li><a href="/logout">Logout</a></li>
           {% else %}
-          <li><a href="/login_register">Login|Register</a></li>
+          <li><a href="/login_register/0">Login|Register</a></li>
+          <li><a href="/clear_session">Clear Session</a></li>
           {% endif %}
           <li><a href="/">Home</a></li>
-          <li><a href="/view_cart">Cart</a></li>
+          <li><button type="button" class="open-button" onclick="openCart()">View Cart</button></li>
         </ul>
       </div>
     </div>
-    <!-- End Top Bar -->
-
-
-    <div class="callout large primary">
-      <div class="text-center">
-        <h1>Place Order</h1>
-      </div>
     </div>
-    
+    <!-- End Top Bar -->
+    <div class="callout large primary">
+        <div class="text-center">
+          <h1>Yoga Store</h1>
+        </div>
+      </div>
+
     <div class="row column text-center">
-      <h3><span>Order Total: </span> ${{session.cart_total}}</h3>
+      <h2>Confirmation</h2>
+      <hr>
+      <p>Thank you for your order. Your payment was successful!</p>
       <hr>
     </div>
 
-    <div class="row column large-up-2">
-      <div class="column">
-
-        <h1>Place Order with PayPal</h1>      
-        <div id="paypal-button"></div>
-        <div id="paypal-button-container"></div>
-      </div>
-      
-      <div class="column">
-        <h1>Cart</h1>
-        <hr>
-        {% for item in session.cart %}
-        <div class="row small-up-2 ordered-item">
-          <div class="column">
-            <h6><span>Name:</span>{{item.name}}</a></h6>
-            <h6><span>Description:</span> {{item.description}}</h6>
-            <h6><span>Quantity:</span> {{item.quantity}}</h6>
-            <h6><span>Unit Cost:</span> ${{item.unit_cost}}</h6>
-            <h6><span>Total Cost:</span> ${{item.unit_cost * item.quantity}}</h6>
-          </div>
-          <div class="column">
-              <img class="thumbnail" src="{{url_for('static',filename='img/'+item.img_file)}}">
-          </div>
-        </div>
-        <hr>
-        {% endfor %}
-        <hr>
+    <div id="my-cart" class="popup">
+      <div id="cart-container">
+        {% if session.cart|length > 0 %}
+        <form action="/update_cart" method="POST">
+          {% for item in session.cart %}
+          <p>
+            <h6>{{item.name}} </h6> <h6>${{item.quantity * item.unit_cost}}</h6>
+            <label for="{{item.id}}">Quantity</label>
+            <input type="number" name="{{item.id}}" id="{{item.id}}" class="cart-item form-control" value="{{item.quantity}}" min="0">
+          </p>        
+          <hr>
+          {% endfor %}
+          <h6>Cart Total: ${{session.cart_total}}</h6>
+          <input type="submit" value="Update Cart" class="btn update">
+          <button type="button" class="btn checkout"><a href="/view_cart">Checkout</a></button>
+        </form>
+        {% else %}
+          <p>No items in cart!</p>
+        {% endif %}
+        <button type="button" class="btn cancel" onclick="closeCart()">Close</button>    
       </div>
     </div>
-    
+
     <div class="callout large secondary">
       <div class="row">
         <div class="large-4 columns">
@@ -88,8 +85,8 @@
           <ul class="menu vertical">
             <li><a href="#yoga-products">Products</a></li>
             <li><a href="#yoga-services">Services</a></li>
-            <li><a href="#">My Account</a></li>
-            <li><a href="#">Login|Register</a></li>
+            <li><a href="/my_account">My Account</a></li>
+            <li><a href="/login_register/0">Login|Register</a></li>
           </ul>
         </div>
         <div class="large-3 columns">
@@ -102,11 +99,12 @@
         </div>
       </div>
     </div>
+
     <script src="https://code.jquery.com/jquery-2.1.4.min.js"></script>
     <script src="https://dhbhdrzi4tiry.cloudfront.net/cdn/sites/foundation.js"></script>
     <script>$(document).foundation();</script>
     <script src="https://www.paypal.com/sdk/js?client-id=AdQRFW9SyfvciiVeF5oeOWosrOuz1qAdMi0Lguu9rT8MxDya68zQZiQGljosQkIXT9e197qV120VSjre"></script>
-    <script src="{{url_for('static',filename='js/cart_popup.js')}}"></script>
     <script src="{{url_for('static',filename='js/paypal.js')}}"></script>
-</body>
+    <script src="{{url_for('static',filename='js/cart_popup.js')}}"></script>
+  </body>
 </html>
