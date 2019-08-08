@@ -61,9 +61,6 @@ def create_payment():
       "description": "This is the payment transaction description."}]})
   if payment.create():
     print('payment success')
-    for link in payment.links:
-      if link.method=="REDIRECT":
-        redirect_url = (link.href)
   else:
     print(payment.error)
 
@@ -72,18 +69,43 @@ def create_payment():
 def execute_payment():
   success = False
   payment = paypalrestsdk.Payment.find(request.form['paymentID'])
+  print(payment)
+  #create object to commit to the Orders db
+  products_in_order = payment.transactions[0].item_list.items
+  order = {
+    'paypal_payment_id':payment.id,
+    'cost':payment.transactions[0].amount.total,
+    'user':session['id'],
+    'products':products_in_order,
+    'shipping_id':session['shipping_id']
+  }
+  print(request.form)
 
   if payment.execute({'payer_id': request.form['payerID']}):
     print("execute success")
     success = True
-    #commit order to the DB
+    session.pop('cart')
+    session.pop('cart_total')
+    session.pop('shipping_address')
+    session.pop('shipping_id')
 
+    new_instance_of_order = Order(cost=order['cost'],paypal_orders_id=order['paypal_payment_id'],user_id=order['user'],shippings_id=order['shipping_id'])
+    #commit order to the DB
+    db.session.add(new_instance_of_order)
+    db.session.commit()
+    instance_of_order = Order.query.filter_by(paypal_orders_id=order['paypal_payment_id']).first()
+    #make a relationship between the order and products
+    for product in order['products']:
+      existing_product = Product.query.get(int(product.sku))
+      print(existing_product.name)
+      instance_of_order.products_in_this_order.append(existing_product)
+  #fail if there is an error during payment processing
   else:
     print(payment.error)
     flash('There was an error when placing payment')
     return redirect('/place_order')
 
-  return jsonify({'success':success})
+  return jsonify({'success':'/success'})
 
 def landing():
   #select all the products and display them on the page
@@ -180,7 +202,9 @@ def register(flag=0): #flag = 1 if the user is trying to place an order. otherwi
   return redirect('/my_account')
 
 def my_account():
-  return render_template('myaccount.html')
+  instance_of_user = User.query.get(session['id'])
+  all_orders = instance_of_user.user_orders
+  return render_template('myaccount.html', user=instance_of_user, all_orders = all_orders)
 
 def view_order():
   return render_template('view_order.html')
@@ -260,6 +284,9 @@ def update_cart_and_shipping_checkout():
     new_shipping_instance = Shipping(first_name=session['shipping_fn'], last_name=session['shipping_ln'], address=session['shipping_address'])
     db.session.add(new_shipping_instance)
     db.session.commit()
+    instance_of_shippings = Shipping.query.filter_by(address=session['shipping_address'], first_name=session['shipping_fn'], last_name=session['shipping_ln']).first()
+  
+  session['shipping_id'] = instance_of_shippings.id
 
   return redirect('/place_order')
 

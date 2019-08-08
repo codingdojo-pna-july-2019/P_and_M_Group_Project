@@ -70,15 +70,15 @@
     <hr>
     <p>
       <label for="fn">First Name</label>
-      <input type="text" name="first_name" id="fn" class="form-control" value="Melissa">
+      <input type="text" name="first_name" id="fn" class="form-control" value="{{user.f_name}}">
     </p>
     <p>
       <label for="ln">Last Name</label>
-      <input type="text" name="last_name" id="ln" class="form-control" value="Littleton">
+      <input type="text" name="last_name" id="ln" class="form-control" value="{{user.l_name}}">
     </p>
     <p>
       <label for="email">Email</label>
-      <input type="text" name="email" id="email" class="form-control" value="mmankt2@gmail.com">
+      <input type="text" name="email" id="email" class="form-control" value="{{user.email}}">
     </p>
     <p>
       <input type="submit" value="Update">
@@ -122,26 +122,14 @@
         </tr>
       </thead>
       <tbody>
+        {% if all_orders|length < 1 %}
         <tr>
-          <td>7/21/2019</td>
-          <td>some details, maybe the first item in the order plus the total cost</td>
-          <td><form action="/vieworder/id" method="POST">
-            <input type="submit" name="view_order" value="View">
-          </form>
-          </td>
+          <td>No Orders to Display!</td>
         </tr>
+        {% endif %}
+        {% for order in all_orders %}
         <tr>
-          <td>6/11/2019</td>
-          <td>some details, maybe the first item in the order plus the total cost</td>
-          <td><form action="/vieworder/id" method="POST">
-            <input type="submit" name="view_order" value="View">
-          </form>
-          </td>
-        </tr>
-        
-        {% for order in orders %}
-        <tr>
-          <td>order date</td>
+          <td>{{order.created_at}}</td>
           <td>some details, maybe the first item in the order plus the total cost</td>
           <td><form action="/vieworder/{{order.id}}" method="POST">
             <input type="submit" name="view_order" value="View">

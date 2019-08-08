@@ -19,7 +19,8 @@ paypal.Button.render({
     })
       .then(function(res) {
         // 3. Show the buyer a confirmation message.
-        console.log(res.success)
+        window.location.replace(res.success);
+       // console.log(res.success)
       });
   }
 }, '#paypal-button');
