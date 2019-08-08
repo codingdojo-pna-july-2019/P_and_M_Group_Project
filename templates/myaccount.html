@@ -117,7 +117,7 @@
       <thead>
         <tr>
           <th>Transaction Date</th>
-          <th>Details</th>
+          <th>Order Total</th>
           <th>Actions (view)</th>
         </tr>
       </thead>
@@ -130,7 +130,7 @@
         {% for order in all_orders %}
         <tr>
           <td>{{order.created_at}}</td>
-          <td>some details, maybe the first item in the order plus the total cost</td>
+          <td>${{order.cost}}</td>
           <td><form action="/vieworder/{{order.id}}" method="POST">
             <input type="submit" name="view_order" value="View">
           </form>

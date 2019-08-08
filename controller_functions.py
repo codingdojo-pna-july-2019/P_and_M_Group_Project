@@ -204,6 +204,10 @@ def register(flag=0): #flag = 1 if the user is trying to place an order. otherwi
 def my_account():
   instance_of_user = User.query.get(session['id'])
   all_orders = instance_of_user.user_orders
+  print(all_orders)
+  products = list()
+  for order in all_orders:
+    print(order.products_in_this_order)
   return render_template('myaccount.html', user=instance_of_user, all_orders = all_orders)
 
 def view_order():
